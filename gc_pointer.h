@@ -185,41 +185,21 @@ bool Pointer<T, size>::collect() {
     // Note: collect() will be called in the destructor
     bool deleted = false;
 
-    auto new_end = std::remove_if(refContainer.begin(), refContainer.end(),
-                                  [&deleted](const PtrDetails<T> &ptrDetails) {
-                                      if (ptrDetails.refcount == 0) {
-                                          ptrDetails.isArray ? delete[] ptrDetails.memPtr : delete ptrDetails.memPtr;
-                                          deleted = true;
-                                          return true;
-                                      } else {
-                                          return false;
-                                      }
-                                      //return ptrDetails.refcount == 0;
-                                  });
+    auto removeIf = [&deleted](const PtrDetails<T> &ptrDetails) {
+        if (ptrDetails.refcount == 0) {
+            ptrDetails.isArray ? delete[] ptrDetails.memPtr : delete ptrDetails.memPtr;
+            deleted = true;
+            return true;
+        }
+        return false;
+    };
 
+    // move unwanted items to end
+    auto new_end = std::remove_if(refContainer.begin(), refContainer.end(), removeIf);
+
+    // erase items from end of list
     refContainer.erase(new_end, refContainer.end());
 
-    /*auto it = refContainer.end();
-    while (it > refContainer.begin())
-    {
-        it--;
-        if (it->refcount == 0) {
-            it->isArray ? delete[] it->memPtr : delete it->memPtr;
-            it = refContainer.erase(it);
-            deleted = true;
-        }
-    }*/
-
-
-    std::cout << "cleared list " << deleted << std::endl;
-
-    //for (auto p = refContainer.begin(); p != refContainer.end(); p++) {
-    //if (p->refcount == 0) {
-    //deleted = true;
-    //p->isArray ? delete[] p->memPtr : delete p->memPtr;
-    //refContainer.remove(*p);
-    //};
-    //}
     return deleted;
 }
 
