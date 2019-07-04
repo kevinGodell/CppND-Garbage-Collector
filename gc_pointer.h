@@ -181,6 +181,8 @@ Pointer<T, size>::~Pointer() {
 template<class T, unsigned size>
 bool Pointer<T, size>::collect() {
 
+    // based on answer @https://stackoverflow.com/a/4478653/8965434
+
     // TODO: Implement collect function
     // LAB: New and Delete Project Lab
     // Note: collect() will be called in the destructor
